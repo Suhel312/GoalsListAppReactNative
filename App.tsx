@@ -1,118 +1,86 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+// import { StatusBar } from 'expo-status-bar';
+import { SetStateAction, useState } from 'react';
+import { StyleSheet, View, Alert, FlatList } from 'react-native';
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+export default function App() {
+    const [enteredGoalText, setEnteredGoalText] = useState<string>('');
+    const [coursgoals, setCoursGoals] = useState<{ key: string, value: string }[]>([]);
+    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [editIndex, setEditEndex] = useState<number | null>(null);
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    function goalInputHandler(enterdText: string) {
+        setEnteredGoalText(enterdText)
+    }
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+    function addGoalHandler() {
+        if (enteredGoalText.trim().length === 0) {
+            Alert.alert('Invalid input', 'Goal cannot be empty!!!');
+            return
+        }
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+        if (isEditing && editIndex !== null) {
+            const updateGoals = [...coursgoals];
+            updateGoals[editIndex].value = enteredGoalText;
+            setCoursGoals(updateGoals);
+            setIsEditing(false)
+            setEditEndex(null)
+        } else {
+            setCoursGoals(currentCourcegoals => [
+                ...currentCourcegoals,
+                { key: Math.random().toString(), value: enteredGoalText }
+            ]);
+        }
+        setEnteredGoalText('');
+    }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    function editGoalHandler(index: number) {
+        setEnteredGoalText(coursgoals[index].value);
+        setIsEditing(true);
+        setEditEndex(index);
+    }
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    function deleteGoalhandler(index: number) {
+        setCoursGoals(currentCourceGoals => currentCourceGoals.filter((_, i) => i !== index));
+    }
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+    return (
+        <View style={styles.container}>
+            
+            <View style={styles.goalsContainer}>
+                <GoalInput
+                isEditing = {isEditing}
+                goalInputHandler = {goalInputHandler}
+                enteredGoalText = {enteredGoalText}
+                addGoalHandler = {addGoalHandler}
+                />
+                <FlatList
+                    data={coursgoals}
+                    renderItem={({ item, index }) =>
+                        <GoalItem
+                        item = {item}
+                        index = {index}
+                        isEditing={isEditing}
+                        editGoalHandler = {editGoalHandler}
+                        deleteGoalhandler = {deleteGoalhandler}
+
+                        />}
+                    keyExtractor={(item) => item.key}
+                />
+            </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+    );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+    container: {
+        flex: 1,
+        padding: 50,
+        paddingHorizontal: 16
+    },
+    goalsContainer: {
+        flex: 5
+    },
+    
 });
-
-export default App;
