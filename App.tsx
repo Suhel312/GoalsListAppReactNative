@@ -10,13 +10,13 @@ export default function App() {
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editIndex, setEditEndex] = useState<number | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [selectedGoal, setSelectedGoal] = useState<{ key: String, value: String } | null>(null);
+    const [selectedGoal, setSelectedGoal] = useState<{ key: string, value: string } | null>(null);
 
-    function goalInputHandler(enterdText: string) {
+    const goalInputHandler = (enterdText: string) => {
         setEnteredGoalText(enterdText)
     }
 
-    function addGoalHandler() {
+    const addGoalHandler = () => {
         if (enteredGoalText.trim().length === 0) {
             Alert.alert('Invalid input', 'Goal cannot be empty!!!');
             return
@@ -37,22 +37,22 @@ export default function App() {
         setEnteredGoalText('');
     }
 
-    function editGoalHandler(index: number) {
+    const editGoalHandler = (index: number) => {
         setEnteredGoalText(coursgoals[index].value);
         setIsEditing(true);
         setEditEndex(index);
     }
 
-    function deleteGoalhandler(index: number) {
+    const deleteGoalHandler = (index: number) => {
         setCoursGoals(currentCourceGoals => currentCourceGoals.filter((_, i) => i !== index));
     }
 
-    function showGoalDetails(goal: { key: string, value: string }) {
+    const showGoalDetails = (goal: { key: string; value: string }) => {
         setSelectedGoal(goal);
         setIsModalVisible(true);
     }
 
-    function closeModal() {
+    const closeModal = () => {
         setIsModalVisible(false);
         setSelectedGoal(null);
     }
@@ -75,7 +75,7 @@ export default function App() {
                             index={index}
                             isEditing={isEditing}
                             editGoalHandler={editGoalHandler}
-                            deleteGoalhandler={deleteGoalhandler}
+                            deleteGoalHandler={deleteGoalHandler}
                             showGoalDetails={showGoalDetails}
                         />}
                     keyExtractor={(item) => item.key}
