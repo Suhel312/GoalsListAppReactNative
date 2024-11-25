@@ -1,6 +1,6 @@
 import { View, TextInput, Button, StyleSheet} from "react-native";
 
-export default function GoalInput({isEditing, goalInputHandler, enteredGoalText, addGoalHandler}: any) {
+export default function GoalInput({isEditing, goalInputHandler, enteredGoalText, addGoalHandler}: Boolean,any) {
     return(
         <View style={styles.inputContainer}>
                 <TextInput style={styles.textInput}

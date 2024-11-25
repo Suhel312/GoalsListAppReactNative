@@ -1,13 +1,13 @@
-import { View, Text, Button, StyleSheet } from 'react-native'
+import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native'
 
-export default function GoalItem({ item, index, isEditing, editGoalHandler, deleteGoalhandler }: any) {
+export default function GoalItem({ item, index, isEditing, editGoalHandler, deleteGoalhandler, showGoalDetails }: any) {
     return (
         <View style={styles.goalItem}>
-            <View style={styles.textContainer}>
+            <TouchableOpacity onPress={() => showGoalDetails(item)} style={styles.textContainer}>
                 <Text style={styles.goalText} numberOfLines={3} ellipsizeMode="tail">
                     {item.value}
                 </Text>
-            </View>
+            </TouchableOpacity>
             <View style={styles.buttonContainer}>
                 <Button title='Edit' onPress={() => editGoalHandler(index)} />
                 {!isEditing && (
