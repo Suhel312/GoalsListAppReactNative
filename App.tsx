@@ -1,53 +1,64 @@
 // import { StatusBar } from 'expo-status-bar';
-import { SetStateAction, useState } from 'react';
+import React, { SetStateAction, useState } from 'react';
 import { StyleSheet, View, Alert, FlatList, Modal, Text, Button } from 'react-native';
 import GoalItem from './components/GoalItem';
 import GoalInput from './components/GoalInput';
+import { Picker } from '@react-native-picker/picker';
 
-export default function App() {
+const catergories = ['All', 'Work', 'Personal', 'Health'];
+
+const App: React.FC = () => {
     const [enteredGoalText, setEnteredGoalText] = useState<string>('');
-    const [coursgoals, setCoursGoals] = useState<{ key: string, value: string }[]>([]);
+    const [coursgoals, setCoursGoals] = useState<{ key: string, value: string, category: string }[]>([]);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [editIndex, setEditEndex] = useState<number | null>(null);
     const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-    const [selectedGoal, setSelectedGoal] = useState<{ key: string, value: string } | null>(null);
+    const [selectedGoal, setSelectedGoal] = useState<{ key: string, value: string, category: string } | null>(null);
+    const [goalCategory, setGoalCategory] = useState<string>(catergories[1])
+    const [selectedCategory, setSelectedCategory] = useState<string>('All')
 
     const goalInputHandler = (enterdText: string) => {
         setEnteredGoalText(enterdText)
     }
 
+    const categoryChangeHandler = (category: string) => {
+        setGoalCategory(category);
+    }
+
     const addGoalHandler = () => {
         if (enteredGoalText.trim().length === 0) {
             Alert.alert('Invalid input', 'Goal cannot be empty!!!');
-            return
+            return;
         }
 
         if (isEditing && editIndex !== null) {
-            const updateGoals = [...coursgoals];
-            updateGoals[editIndex].value = enteredGoalText;
-            setCoursGoals(updateGoals);
-            setIsEditing(false)
-            setEditEndex(null)
+            const updatedGoals = [...coursgoals];
+            updatedGoals[editIndex] = { ...updatedGoals[editIndex], value: enteredGoalText, category: goalCategory };
+            setCoursGoals(updatedGoals);
+            setIsEditing(false);
+            setEditEndex(null);
         } else {
-            setCoursGoals(currentCourcegoals => [
+            setCoursGoals((currentCourcegoals) => [
                 ...currentCourcegoals,
-                { key: Math.random().toString(), value: enteredGoalText }
+                { key: Math.random().toString(), value: enteredGoalText, category: goalCategory },
             ]);
         }
         setEnteredGoalText('');
     }
 
     const editGoalHandler = (index: number) => {
-        setEnteredGoalText(coursgoals[index].value);
+        const goal = coursgoals[index];
+        setEnteredGoalText(goal.value);
+        setGoalCategory(goal.category);
         setIsEditing(true);
         setEditEndex(index);
     }
 
     const deleteGoalHandler = (index: number) => {
-        setCoursGoals(currentCourceGoals => currentCourceGoals.filter((_, i) => i !== index));
+        setCoursGoals((currentGoals) => currentGoals.filter((_, i) => i !== index));
     }
 
-    const showGoalDetails = (goal: { key: string; value: string }) => {
+    const showGoalDetails = (goal: { key: string; value: string, category: string }) => {
         setSelectedGoal(goal);
         setIsModalVisible(true);
     }
@@ -56,20 +67,34 @@ export default function App() {
         setIsModalVisible(false);
         setSelectedGoal(null);
     }
+    const filteredGoals = selectedCategory === 'All'
+        ? coursgoals
+        : coursgoals.filter((goal) => goal.category === selectedCategory);
 
     return (
         <View style={styles.container}>
-
             <View style={styles.goalsContainer}>
                 <GoalInput
                     isEditing={isEditing}
                     goalInputHandler={goalInputHandler}
                     enteredGoalText={enteredGoalText}
                     addGoalHandler={addGoalHandler}
+                    categories={catergories}
+                    selectedCategory={goalCategory}
+                    categoryChangeHandler={categoryChangeHandler}
                 />
+                <Picker
+                    selectedValue={selectedCategory}
+                    style={styles.picker}
+                    onValueChange={(itemValue) => setSelectedCategory(itemValue)}
+                >
+                    {catergories.map((category) => (
+                        <Picker.Item label={category} value={category} key={category} />
+                    ))}
+                </Picker>
                 <FlatList
-                    data={coursgoals}
-                    renderItem={({ item, index }) =>
+                    data={filteredGoals}
+                    renderItem={({ item, index }) => (
                         <GoalItem
                             item={item}
                             index={index}
@@ -77,7 +102,8 @@ export default function App() {
                             editGoalHandler={editGoalHandler}
                             deleteGoalHandler={deleteGoalHandler}
                             showGoalDetails={showGoalDetails}
-                        />}
+                        />
+                    )}
                     keyExtractor={(item) => item.key}
                 />
             </View>
@@ -86,7 +112,7 @@ export default function App() {
                 <View style={styles.modalConatainer}>
                     {selectedGoal && (
                         <>
-                            <Text style={styles.modalText}>{selectedGoal.value}</Text>
+                            <Text style={styles.modalText}>{selectedGoal.value} ({selectedGoal.category})</Text>
                             <Button title='Close' onPress={closeModal} />
                         </>
                     )}
@@ -105,6 +131,10 @@ const styles = StyleSheet.create({
     goalsContainer: {
         flex: 5
     },
+    picker: {
+        marginVertical: 10,
+        width: '100%'
+    },
     modalConatainer: {
         flex: 1,
         justifyContent: 'center',
@@ -117,3 +147,5 @@ const styles = StyleSheet.create({
         color: 'black'
     },
 });
+
+export default App;

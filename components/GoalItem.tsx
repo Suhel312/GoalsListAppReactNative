@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native'
 
 interface GoalItemProps {
-    item: {key: string; value: string};
+    item: {key: string; value: string, category: string};
     index: number;
     isEditing: boolean;
     editGoalHandler: (index: number) => void;
     deleteGoalHandler: (index: number) => void;
-    showGoalDetails: (goal: {key: string; value: string}) => void;
+    showGoalDetails: (goal: {key: string; value: string, category: string}) => void;
 }
 
 const GoalItem: React.FC<GoalItemProps> = ({
